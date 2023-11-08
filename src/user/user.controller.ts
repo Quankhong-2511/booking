@@ -13,6 +13,9 @@ import {
   UploadedFile,
   UseInterceptors,
   BadRequestException,
+  DefaultValuePipe,
+  ParseIntPipe,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
@@ -23,16 +26,38 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { extname } from 'path';
+import { RolesGuard } from 'src/roles/roles.guard';
+import { Roles } from 'src/roles/roles.decorator';
+import { RoleEnum } from 'src/roles/roles.enum';
+import { InfinityPaginationResultType } from 'src/utils/types/infinity-pagination-result';
+import { infinityPagination } from 'src/utils/validators/infinity-pagination';
+
+
 
 @ApiBearerAuth()
+@UseInterceptors(ClassSerializerInterceptor)
+@Roles(RoleEnum.admin)
 @ApiTags('User')
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Get('/')
-  findAll(): Promise<User[]> {
-    return this.userService.findAll();
+  async findAll(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+  ) {
+    if (limit > 50) {
+      limit = 50;
+    }
+
+    return infinityPagination(
+      await this.userService.findAll({
+        page,
+        limit,
+      }),
+      { page, limit },
+    );
   }
 
   @Get('/:userId')
@@ -42,6 +67,7 @@ export class UserController {
     return await this.userService.findOne(userId);
   }
 
+  @UseGuards(RolesGuard)
   @Post('/')
   async create(@Body() createUserDto: CreateUserDto) {
     return await this.userService.create(createUserDto);

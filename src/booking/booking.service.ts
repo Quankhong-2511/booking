@@ -23,31 +23,39 @@ export class BookingService {
   findOne() {}
 
   async findInReviewOrder(): Promise<Booking[]> {
-    const bookings = await this.bookingRepository.find({
+    return await this.bookingRepository.find({
       where: { statusBooking: 'In-review-order' },
     });
-    return bookings;
   }
 
   async findInReviewCancel(): Promise<Booking[]> {
-    const bookings = await this.bookingRepository.find({
+    return await this.bookingRepository.find({
       where: { statusBooking: 'In-review-cancel' },
     });
-    return bookings;
   }
 
   async findApprove(): Promise<Booking[]> {
-    const bookings = await this.bookingRepository.find({
+    return await this.bookingRepository.find({
       where: { statusBooking: 'Approve' },
     });
-    return bookings;
   }
-  
+
   async findReject(): Promise<Booking[]> {
-    const bookings = await this.bookingRepository.find({
+    return await this.bookingRepository.find({
       where: { statusBooking: 'Reject' },
     });
-    return bookings;
+  }
+
+  async findPreStart(): Promise<Booking[]> {
+    return await this.bookingRepository.find({
+      where: { statusTrip: 'Pre-start' },
+    });
+  }
+
+  async findEnd(): Promise<Booking[]> {
+    return await this.bookingRepository.find({
+      where: { statusTrip: 'End' },
+    });
   }
 
   async create(createBookingVehicleDto: BookingVehicleDto): Promise<Booking> {

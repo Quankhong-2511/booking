@@ -5,6 +5,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as argon from 'argon2';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { IPaginationOptions } from 'src/utils/types/pagination-option';
 
 @Injectable()
 export class UserService {
@@ -13,47 +14,30 @@ export class UserService {
     private userRepository: Repository<User>,
   ) {}
 
-  async findAll(): Promise<User[]> {
+  // findManyWithPagination(
+  //   paginationOptions: IPaginationOptions,
+  // ): Promise<User[]> {
+  //   return this.userRepository.find({
+  //     skip: (paginationOptions.page - 1) * paginationOptions.limit,
+  //     take: paginationOptions.limit,
+  //   })
+  // }
+
+  async findAll(paginationOptions: IPaginationOptions) {
     return await this.userRepository
       .createQueryBuilder('user')
-      .leftJoin('user.vehicle', 'vehicle')
-      .select([
-        'user.userId',
-        'user.typeAccount',
-        'user.username',
-        'user.fullname',
-        'user.employeeId',
-        'user.department',
-        'user.avatar',
-        'user.createAt',
-        'vehicle.vehicleId',
-        'vehicle.type',
-        'vehicle.licensePlate',
-        'vehicle.seats',
-        'vehicle.status',
-      ])
+      .leftJoinAndSelect('user.vehicle', 'vehicle')
+      .leftJoinAndSelect('user.role', 'role')
       .orderBy('user.createAt', 'ASC')
-      .getMany();
+      .skip((paginationOptions.page - 1) * paginationOptions.limit)
+      .take(paginationOptions.limit)
+      .getManyAndCount();
   }
 
   async findOne(userId: number): Promise<User | { message: string }> {
     const user = await this.userRepository
       .createQueryBuilder('user')
-      .leftJoin('user.vehicle', 'vehicle')
-      .select([
-        'user.userId',
-        'user.typeAccount',
-        'user.username',
-        'user.fullname',
-        'user.employeeId',
-        'user.department',
-        'user.avatar',
-        'vehicle.vehicleId',
-        'vehicle.type',
-        'vehicle.licensePlate',
-        'vehicle.seats',
-        'vehicle.status',
-      ])
+      .leftJoinAndSelect('user.vehicle', 'vehicle')
       .where('user.userId = :userId', { userId })
       .getOne();
     if (!user) {

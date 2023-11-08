@@ -13,11 +13,26 @@ export class VehicleService {
   ) {}
 
   findAll() {
-    return this.vehicleRepository.find({order: {'vehicleId': 'ASC'}})
+    return this.vehicleRepository
+      .createQueryBuilder('vehicle')
+      .leftJoin('vehicle.user', 'user')
+      .select([
+        'vehicle.vehicleId',
+        'vehicle.type',
+        'vehicle.licensePlate',
+        'vehicle.seats',
+        'vehicle.status',
+        'user.username',
+        'user.fullname'
+      ])
+      .orderBy('vehicle.vehicleId', 'ASC')
+      .getMany();
   }
 
   async findOne(vehicleId: number): Promise<Vehicle | { message: string }> {
-    const vehicle = await this.vehicleRepository.findOne({ where: { vehicleId } })
+    const vehicle = await this.vehicleRepository.findOne({
+      where: { vehicleId },
+    });
     if (!vehicle) {
       return { message: 'Không tìm thấy thông tin xe' };
     }
@@ -26,14 +41,14 @@ export class VehicleService {
 
   async findReady() {
     return this.vehicleRepository.find({
-      where: {status: 'Ready'}
-    })
+      where: { status: 'Ready' },
+    });
   }
 
   async findBusy() {
     return this.vehicleRepository.find({
-      where: {status: 'Busy'}
-    })
+      where: { status: 'Busy' },
+    });
   }
 
   async create(createVehicleDto: CreateVehicleDto): Promise<Vehicle> {
@@ -50,6 +65,6 @@ export class VehicleService {
   }
 
   async delete(vehicleId: number) {
-    return await this.vehicleRepository.delete({vehicleId: vehicleId})
+    return await this.vehicleRepository.delete({ vehicleId: vehicleId });
   }
 }

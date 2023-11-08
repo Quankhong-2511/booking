@@ -31,6 +31,9 @@ export class Vehicle {
   })
   status: string;
 
+  @OneToOne(() => User, (user) => user.vehicle)
+  user:User
+
   @OneToMany(() => Booking, (booking) => booking.vehicle)
   booking: Booking[];
 }

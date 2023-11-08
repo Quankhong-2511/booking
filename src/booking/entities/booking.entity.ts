@@ -66,7 +66,7 @@ export class Booking {
   @Column({type: 'enum', enum: Area})
   area: string;
 
-  @OneToOne(() => Reason)
+  @OneToOne(() => Reason, (reason) => reason.booking)
   @JoinColumn({name: 'reason_cancle'})
   reasonCancle: Reason
 

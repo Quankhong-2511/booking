@@ -61,6 +61,22 @@ export class BookingController {
     }
     return bookings;
   }
+  @Get('status/pre-start')
+  async getPreStart(): Promise<Booking[] | { message: string }> {
+    const bookings = await this.bookingService.findPreStart();
+    if (!bookings || bookings.length === 0) {
+      return { message: 'Không tìm thấy xe ở trạng thái Pre-start' };
+    }
+    return bookings;
+  }
+  @Get('status/end')
+  async getEnd(): Promise<Booking[] | { message: string }> {
+    const bookings = await this.bookingService.findEnd();
+    if (!bookings || bookings.length === 0) {
+      return { message: 'Không tìm thấy xe ở trạng thái End' };
+    }
+    return bookings;
+  }
 
   @Post()
   async create(

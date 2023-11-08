@@ -1,11 +1,14 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEnum,
   IsNotEmpty,
   Length,
   Matches,
   IsOptional,
+  Validate,
 } from 'class-validator';
 import { UserRole } from 'src/enums/user.enum';
+import { Role } from 'src/roles/entities/role.entity';
 import { Vehicle } from 'src/vehicle/entities/vehicle.entity';
 
 export class UpdateUserDto {
@@ -50,6 +53,10 @@ export class UpdateUserDto {
 
   @IsOptional()
   employeeId: string;
+
+  @ApiProperty({ type: Role })
+  @IsOptional()
+  role?: Role | null;
 
   @IsOptional()
   vehicle?: Vehicle;

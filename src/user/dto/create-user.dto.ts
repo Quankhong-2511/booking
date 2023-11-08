@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, Length, Matches } from 'class-validator';
 import { UserRole } from 'src/enums/user.enum';
+import { Role } from 'src/roles/entities/role.entity';
 import { Vehicle } from 'src/vehicle/entities/vehicle.entity';
 
 export class CreateUserDto {
@@ -9,7 +10,7 @@ export class CreateUserDto {
   @ApiProperty()
   @IsNotEmpty({message: 'Vui lòng chọn loại tài khoản'})
   @IsEnum(UserRole, {
-    message: 'Kiểu tài khoản phải thuộc: Admin, Phong Ban, HCSN, BGD',
+    message: 'Kiểu tài khoản phải thuộc: Admin, Phong Ban, HCSN, BGD, Tai Xe',
   })
   typeAccount: string;
 
@@ -44,6 +45,9 @@ export class CreateUserDto {
 
   @ApiProperty()
   employeeId: string;
+
+  @ApiProperty({ type: Role })
+  role?: Role | null;
 
   @ApiProperty()
   vehicle?: Vehicle;

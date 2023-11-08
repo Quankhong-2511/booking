@@ -5,12 +5,13 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
 
   // Setup Swagger
   const config = new DocumentBuilder()
     .setTitle('Booking API')
-    .setDescription('List APIs for simple Booking')
+    .setDescription('List APIs for Booking')
     .setVersion('1.0')
     .addTag('Auth')
     .addTag('User')
@@ -19,8 +20,8 @@ async function bootstrap() {
     .addTag('Reason')
     .addBearerAuth()
     .build();
-  const document = SwaggerModule.createDocument(app, config)
-  SwaggerModule.setup('api', app, document)
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
 
   await app.listen(3000);
 }
